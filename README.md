@@ -110,6 +110,13 @@ With `prerender: true`:
 2. That HTML is placed inside the container `<div>`.
 3. On the client side, `react_loader.js` hydrates the existing markup using `hydrateRoot`.
 
+### configuration
+
+On the configuration file `config/initializers/reactrails.rb` is possible configure the gem. The available options are:
+
+- `app_registry_bundle_path`: move SSR app registry bundle to a custom folder
+- `ssr_preload_code`: preload JS code to run
+
 ## How works internally
 
 ### Client JavaScript loader

@@ -135,6 +135,9 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
       Reactrails.configure do |config|
         # Move SSR app registry bundle to a custom folder
         # config.app_registry_bundle_path = Rails.root.join("app/assets/builds/ssr/index.js")
+
+        # Preload JS code to run
+        # config.ssr_preload_code = nil
       end
     FILE
     File.write(initializer_path, new_content)
