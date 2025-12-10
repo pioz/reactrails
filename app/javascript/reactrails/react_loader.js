@@ -1,3 +1,4 @@
+import React from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 
 import { loadProps, warningMessage } from './common'

@@ -36,6 +36,7 @@ This generator will:
 2. Add the `yarn build:ssr` script to compile the SSR bundle in the `package.json`.
 3. Add the `ssr: yarn build:ssr --watch` command in your `Procfile.dev`.
 4. Add the file `app/javascript/components/index.js` for a convenient setup.
+5. Add the file `config/initializers/reactrails.rb` to configure the gem.
 
 ## Usage
 
@@ -63,6 +64,12 @@ use).
 The important part is that, when ReactRails `react_loader.js` runs in the browser,
 `globalThis.ReactRailsComponents` already contains your components.
 
+This file is also built for SSR at the default path
+`app/assets/builds/ssr/index.js`, but you can change this location in the
+`config/initializers/reactrails.rb` configuration file. If you do so, make sure
+to update the output path accordingly in the `build:ssr` script within your
+`package.json`.
+
 ### Render components in Rails views
 
 Reactrails provides a single helper method:
@@ -75,6 +82,8 @@ render_component(component_name, props = {}, options = {})
 - `props` – a Ruby hash that will be converted to JSON and passed to the React component.
 - `options` – extra options; currently:
   - `prerender` – when true, the component is also rendered on the server (SSR).
+  - `tag` – the root tag to use (default `<div>`).
+  - `html_options` – the html attributes to apply to the root tag.
 
 **Client-side only rendering**
 

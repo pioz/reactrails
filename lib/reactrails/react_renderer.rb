@@ -23,7 +23,7 @@ class Reactrails::ReactRenderer
     end
 
     def combined_source
-      app_registry_bundle_path = Rails.root.join("app/assets/builds/ssr/index.js")
+      app_registry_bundle_path = Reactrails.config.app_registry_bundle_path
       server_bundle_path = Reactrails::Engine.root.join("vendor/react_server_rendering.js")
       "#{File.read(app_registry_bundle_path)}\n#{File.read(server_bundle_path)}"
     end

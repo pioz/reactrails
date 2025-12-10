@@ -11,3 +11,9 @@ AllCops:
   NewCops: enable
   Exclude:
     - test/dummy/**/*
+
+Layout/LineLength:
+  Max: 300
+
+Metrics/ClassLength:
+  Max: 200
