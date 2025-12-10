@@ -1,6 +1,8 @@
 require "execjs"
 
 class Reactrails::ReactRenderer
+  @context_mutex = Mutex.new
+
   class << self
     def render(component_name, props = {})
       js_props = props.to_json
@@ -12,7 +14,9 @@ class Reactrails::ReactRenderer
     def context
       # Cache in production
       if Rails.env.production?
-        @context ||= ExecJS.compile(combined_source)
+        @context_mutex.synchronize do
+          @context ||= ExecJS.compile(combined_source)
+        end
       else
         ExecJS.compile(combined_source)
       end
