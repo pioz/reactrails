@@ -1,6 +1,3 @@
-import React from 'react'
-import ReactDOMServer from 'react-dom/server.browser'
-
 import { loadProps, warningMessage } from './common'
 
 globalThis.renderComponent = (componentName, propsJson) => {
@@ -10,6 +7,6 @@ globalThis.renderComponent = (componentName, propsJson) => {
   }
 
   const props = loadProps(componentName, propsJson)
-  const reactElement = React.createElement(Component, props)
-  return ReactDOMServer.renderToString(reactElement)
+  const reactElement = globalThis.React.createElement(Component, props)
+  return globalThis.ReactDOMServer.renderToString(reactElement)
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import { createElement } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 
 import { loadProps, warningMessage } from './common'
@@ -16,7 +16,7 @@ const loadComponents = () => {
     }
 
     const props = loadProps(componentName, el.dataset.reactProps)
-    const reactElement = React.createElement(Component, props)
+    const reactElement = createElement(Component, props)
 
     // If server rendered, use hydrateRoot; otherwise createRoot.
     if (el.hasChildNodes()) {

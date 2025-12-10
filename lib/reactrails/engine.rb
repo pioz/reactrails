@@ -6,8 +6,4 @@ class Reactrails::Engine < Rails::Engine
       include Reactrails::ApplicationHelper
     end
   end
-
-  initializer "reactrails.assets" do |app|
-    app.config.assets.paths << root.join("vendor")
-  end
 end
