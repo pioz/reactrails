@@ -109,6 +109,22 @@ module Reactrails
         File.write(procfile_path, new_content)
         say_status :insert, "Added ssr process under js process in Procfile.dev", :green
       end
+
+      def add_app_components_index
+        index_js_path = "app/javascript/components/index.js"
+        if File.exist?(index_js_path)
+          say_status :info, "#{index_js_path} already present", :blue
+          return
+        end
+
+        new_content = <<~FILE
+          // Global registry for React components.
+          // You can extend this object or generate it automatically.
+          globalThis.ReactRailsComponents = {}
+        FILE
+        File.write(index_js_path, new_content)
+        say_status :insert, "Added #{index_js_path}", :green
+      end
     end
   end
 end
