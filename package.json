@@ -1,0 +1,17 @@
+{
+  "name": "reactrails",
+  "private": true,
+  "devDependencies": {
+    "esbuild": "^0.27.0",
+    "prettier": "^3.7.4"
+  },
+  "scripts": {
+    "build": "yarn build:client && yarn build:server",
+    "build:client": "esbuild app/javascript/reactrails/react_loader.js           --bundle --sourcemap --format=esm --outdir=vendor",
+    "build:server": "esbuild app/javascript/reactrails/react_server_rendering.js --bundle --sourcemap --format=esm --outdir=vendor --platform=browser --format=iife --define:process.env.NODE_ENV=\\\"production\\\""
+  },
+  "dependencies": {
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  }
+}
