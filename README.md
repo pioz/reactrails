@@ -15,7 +15,7 @@ It gives you:
 Add the gem to your `Gemfile`:
 
 ```ruby
-gem "reactrails"
+gem "reactrails", github: "pioz/reactrails"
 ```
 
 and then run:
