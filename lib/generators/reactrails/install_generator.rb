@@ -37,7 +37,8 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
   end
 
   def add_app_components_index
-    index_js_path = "app/javascript/components/index.js"
+    index_js_dir = "app/javascript/components"
+    index_js_path = File.join(index_js_dir, "index.js")
     if File.exist?(index_js_path)
       say_status :info, "#{index_js_path} already present", :blue
       return
@@ -54,6 +55,7 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
         // App
       })
     FILE
+    FileUtils.mkdir_p(index_js_dir)
     File.write(index_js_path, new_content)
     say_status :insert, "added #{index_js_path}", :green
   end
