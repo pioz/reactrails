@@ -34,9 +34,10 @@ This generator will:
 
 1. Add the `javascript_include_tag "reactrails"` in your `application.html.erb` layout.
 2. Add the file `app/javascript/components/index.js` for a convenient setup.
-3. Add the `yarn build:ssr` script to compile the SSR bundle in the `package.json`.
-4. Add the `ssr: yarn build:ssr --watch` command in your `Procfile.dev`.
-5. Add the file `config/initializers/reactrails.rb` to configure the gem.
+3. Add `import './components'` in `app/javascript/application.js`.
+4. Add the `yarn build:ssr` script to compile the SSR bundle in the `package.json`.
+5. Add the `ssr: yarn build:ssr --watch` command in your `Procfile.dev`.
+6. Add the file `config/initializers/reactrails.rb` to configure the gem.
 
 ## Usage
 

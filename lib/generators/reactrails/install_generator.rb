@@ -60,6 +60,26 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
     say_status :insert, "added #{index_js_path}", :green
   end
 
+  def import_components_in_application_js
+    application_js_path = "app/javascript/application.js"
+    unless File.exist?(application_js_path)
+      say_status :warning, "application.js file not found: #{application_js_path}", :yellow
+      return
+    end
+
+    insert_line = "import './components'"
+
+    content = File.read(application_js_path)
+    if content.include?(insert_line)
+      say_status :info, "./components dir already imported in application.js", :blue
+      return
+    end
+
+    new_content = [content.chomp, insert_line].join("\n")
+    File.write(application_js_path, new_content)
+    say_status :insert, "added '#{insert_line}' in application.js", :green
+  end
+
   def add_build_ssr_script_to_package_json
     package_json_path = "package.json"
     script_name = "build:ssr"
