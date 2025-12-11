@@ -67,7 +67,7 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
       return
     end
 
-    insert_line = "import './components'"
+    insert_line = 'import "./components"'
 
     content = File.read(application_js_path)
     if content.include?(insert_line)
