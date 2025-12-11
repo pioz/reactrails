@@ -53,6 +53,11 @@ const init = (React, ReactDOMClient, ReactDOMServer, registryComponents) => {
     })
   }
 
+  if (typeof document !== 'undefined') {
+    // document.addEventListener('DOMContentLoaded', loadComponents)
+    document.addEventListener('turbo:load', loadComponents)
+  }
+
   if (ReactDOMServer) {
     globalThis.renderComponent = (componentName, propsJson) => {
       const Component = registryComponents?.[componentName] || null
@@ -66,10 +71,6 @@ const init = (React, ReactDOMClient, ReactDOMServer, registryComponents) => {
     }
   }
 
-  if (typeof document !== 'undefined') {
-    // document.addEventListener('DOMContentLoaded', loadComponents)
-    document.addEventListener('turbo:load', loadComponents)
-  }
 }
 
 globalThis.initReactRails = init

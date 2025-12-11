@@ -47,6 +47,9 @@ var init = (React, ReactDOMClient, ReactDOMServer, registryComponents) => {
       }
     });
   };
+  if (typeof document !== "undefined") {
+    document.addEventListener("turbo:load", loadComponents);
+  }
   if (ReactDOMServer) {
     globalThis.renderComponent = (componentName, propsJson) => {
       const Component = registryComponents?.[componentName] || null;
@@ -57,9 +60,6 @@ var init = (React, ReactDOMClient, ReactDOMServer, registryComponents) => {
       const reactElement = React.createElement(Component, props);
       return ReactDOMServer.renderToString(reactElement);
     };
-  }
-  if (typeof document !== "undefined") {
-    document.addEventListener("turbo:load", loadComponents);
   }
 };
 globalThis.initReactRails = init;

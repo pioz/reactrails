@@ -20,6 +20,5 @@ Gem::Specification.new do |spec|
   end
 
   spec.required_ruby_version = ">= 3.0"
-  spec.add_dependency "execjs", ">= 2.10.0"
   spec.add_dependency "rails", ">= 8.1.1"
 end
