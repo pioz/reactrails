@@ -1,14 +1,16 @@
 # Reactrails
 
-Reactrails is a Rails engine that makes it easy to integrate **React** into
-a **Rails** application using modern **esbuild**, with optional **server-side
-rendering (SSR)** powered by Node JS.
+Reactrails is a Rails engine designed to seamlessly integrate **React** into
+a **Rails** application using a modern **esbuild**-based toolchain, with
+optional **server-side rendering (SSR)** powered by Node.js.
 
-It gives you:
+It provides:
 
-- A simple **view helper** to render React components from your Rails views.
-- Automatic **client-side render or hydration** using a small loader script.
-- Optional **SSR support** so you can render components on the server for better SEO and faster first paint.
+- A simple **view helper** to render React components in your Rails views.
+- Automatic **client-side rendering or hydration** using a lightweight loader script.
+- Optional **SSR support** for better SEO, improved perceived performance, and a faster first paint.
+
+---
 
 ## Installation
 
@@ -18,13 +20,13 @@ Add the gem to your `Gemfile`:
 gem "reactrails", github: "pioz/reactrails"
 ```
 
-and then run:
+Then install:
 
 ```sh
 bundle install
 ```
 
-Reactrails provides a Rails generator to setup your current application:
+Run the installer:
 
 ```sh
 bin/rails generate reactrails:install
@@ -32,27 +34,30 @@ bin/rails generate reactrails:install
 
 This generator will:
 
-1. Add the `javascript_include_tag "reactrails"` in your `application.html.erb` layout.
-2. Add the file `app/javascript/components/index.js` for a convenient setup.
-3. Add `import "./components"` in `app/javascript/application.js`.
-4. Add the `yarn build:ssr` script to compile the SSR bundle in the `package.json`.
-5. Add the `ssr: yarn build:ssr --watch` command in your `Procfile.dev`.
-6. Add the file `config/initializers/reactrails.rb` to configure the gem.
+1. Insert `javascript_include_tag "reactrails"` in your layout.
+2. Create `app/javascript/components/index.js` as an entry point for your components.
+3. Import this file from `app/javascript/application.js`.
+4. Add `yarn build:ssr` to your `package.json`.
+5. Add `ssr: yarn build:ssr --watch` to your `Procfile.dev`.
+6. Create the initializer `config/initializers/reactrails.rb`.
+
+---
 
 ## Usage
 
 ### Register your React components
 
 Reactrails must be initialized by calling the global `initReactRails` function
-provided by the JavaScript file included with
-`javascript_include_tag "reactrails"`. This function takes four parameters:
+included via `javascript_include_tag "reactrails"`.
 
-- The React object
-- The ReactDOMClient object
-- Optionally, the ReactDOMServer object (if you use SSR; otherwise pass `null`)
-- A registry object containing all the components you need to mount in your Rails application.
+This function accepts:
 
-Example: `app/javascript/components/index.js`:
+- `React`
+- `ReactDOMClient`
+- (optional) `ReactDOMServer` — required if you want SSR
+- a **registry object** mapping names to components
+
+Example (`app/javascript/components/index.js`):
 
 ```js
 import React from 'react'
@@ -68,32 +73,38 @@ initReactRails(React, ReactDOMClient, ReactDOMServer, {
 })
 ```
 
-Compile this file with your own esbuild setup so that it is available to the
-browser (for example via `app/assets/builds` or whatever output directory you
-use).
+Make sure this file is bundled by your esbuild setup (for example into `app/assets/builds`).
 
-This file is also built for SSR at the default path
-`app/assets/builds/ssr/index.js`, but you can change this location in the
-`config/initializers/reactrails.rb` configuration file. If you do so, make sure
-to update the output path accordingly in the `build:ssr` script within your
-`package.json`.
+Reactrails also expects an SSR build of this file at:
 
-### Render components in Rails views
+```
+app/assets/builds/ssr/index.js
+```
 
-Reactrails provides a single helper method:
+You can customize this path inside the initializer.
+
+---
+
+## Rendering components in Rails views
+
+Reactrails exposes a single helper:
 
 ```ruby
 render_component(component_name, props = {}, options = {})
 ```
 
-- `component_name` – the key you used in ReactRailsComponents (string).
-- `props` – a Ruby hash that will be converted to JSON and passed to the React component.
-- `options` – extra options; currently:
-  - `prerender` – when true, the component is also rendered on the server (SSR).
-  - `tag` – the root tag to use (default `<div>`).
-  - `html_options` – the html attributes to apply to the root tag.
+Parameters:
 
-**Client-side only rendering**
+- **component_name** — the key used in your JavaScript registry
+- **props** — a Ruby hash serialized to JSON
+- **options**:
+  - `prerender`: enables server-side rendering (SSR)
+  - `tag`: the HTML tag to wrap the component (default: `:div`)
+  - `html_options`: HTML attributes for the wrapper tag
+
+---
+
+### Client-side rendering
 
 ```ruby
 <%= render_component "Hello", { name: "Enrico" } %>
@@ -101,12 +112,12 @@ render_component(component_name, props = {}, options = {})
 
 This will:
 
-1. Render a `<div>` with `data-react-component`and`data-react-props`.
-2. Let reactrails find that node, instantiate the React component, and mount it via `createRoot`.
+1. Output a `<div>` with `data-react-component` and `data-react-props`.
+2. Let the client-side loader detect the node and mount the React component via `createRoot`.
 
-**Server-side rendering (SSR) + hydration**
+---
 
-To enable SSR for a component:
+### Server-side rendering (SSR)
 
 ```ruby
 <%= render_component "Hello", { name: "Enrico" }, prerender: true %>
@@ -114,50 +125,114 @@ To enable SSR for a component:
 
 With `prerender: true`:
 
-1. Reactrails renders the component to an HTML string using Node JS on the server.
-2. That HTML is placed inside the container `<div>`.
-3. On the client side, reactrails hydrates the existing markup using `hydrateRoot`.
+1. Reactrails renders the component to an HTML string using Node.js.
+2. The markup is embedded inside the wrapper element.
+3. On the client side, React hydrates the existing HTML using `hydrateRoot`.
 
-### Configuration
+---
 
-On the configuration file `config/initializers/reactrails.rb` is possible
-configure the gem. The available options are:
+## Configuration
 
-- `ssr_init_reactrails_bundle_path`: move SSR bundle file with `initReactRails` call to a custom path
-- `ssr_preload_code`: optional JavaScript code used to customize the server-side rendering context
+Configure Reactrails in `config/initializers/reactrails.rb`. Available options:
 
-## How works internally
+- `ssr_init_reactrails_bundle_path` — custom path for the SSR bundle (the build containing your `initReactRails` call).
+- `ssr_preload_code` — optional JavaScript executed before SSR, useful for polyfills or exposing globals.
 
-### Client JavaScript loader
+Example:
 
-The client loader provided by the gem works as follows:
-
-1. Listens for `turbo:load` events.
-2. Scans the document for elements with `data-react-component`.
-3. Reads the component name and JSON props from `data-react-component` and `data-react-props`.
-4. Finds the corresponding React component registered with `initReactRails` function.
-5. Creates a React element with the props.
-6. Uses:
-   - `hydrateRoot` if the element already has children (SSR case),
-   - otherwise `createRoot` and `root.render`.
-
-### SSR loader
-
-On the Ruby side, Reactrails uses `Reactrails::ReactRenderer`:
-
-- It reads:
-  - Your app's SSR bundle: `app/assets/builds/ssr/index.js` (generated by `yarn build:ssr`)
-  - The gem's server-side reactrails bundle: `reactrails.js`
-- It concatenates them and compiles them with Node JS.
-- It finally calls:
-
-```
-context.call("renderComponent", component_name, props_json)
+```ruby
+Reactrails.configure do |config|
+  config.ssr_init_reactrails_bundle_path = Rails.root.join("app/assets/builds/ssr/index.js")
+  config.ssr_preload_code = "// custom global setup"
+end
 ```
 
-## Build vendor assets
+---
 
-You can rebuild the gem's internal JavaScript bundle with:
+## How it works internally
+
+### Client loader
+
+The client script:
+
+1. Listens for `turbo:load`.
+2. Scans for `[data-react-component]` elements.
+3. Reads component names and props.
+4. Looks up the component in your registry.
+5. Creates a React element.
+6. Hydrates if the element already contains HTML, otherwise renders it fresh.
+
+### Server-side rendering
+
+SSR is handled by `Reactrails::ReactRenderer`, which:
+
+1. Reads:
+   - Your SSR bundle (`build:ssr`)
+   - The gem’s internal SSR runtime (`reactrails.js`)
+
+2. Concatenates & evaluates them inside a Node.js context.
+3. Calls:
+
+```
+renderComponent(component_name, props_json)
+```
+
+which is implemented within the JavaScript runtime.
+
+---
+
+## Troubleshooting
+
+### **Node executable not found**
+
+You may see errors like:
+
+> `Node executable not found`
+
+Solutions:
+
+- Ensure Node.js is installed.
+- Make sure `node` is available in your PATH.
+- Optionally set:
+
+```sh
+export NODE_BINARY_PATH=/path/to/node
+```
+
+### **SSR bundle missing**
+
+If you see:
+
+> `Cannot read file app/assets/builds/ssr/index.js`
+
+then your SSR bundle hasn't been built.
+
+Run:
+
+```sh
+yarn build:ssr
+```
+
+or keep it updated automatically:
+
+```sh
+yarn build:ssr --watch
+```
+
+### **Components not mounting on the client**
+
+Check:
+
+- The component is registered in `initReactRails`.
+- The wrapper element appears in the DOM.
+- The props JSON is valid (errors are logged to the console).
+- Turbo is enabled; if you don't use Turbo, manually call `loadComponents()`.
+
+---
+
+## Rebuilding gem assets
+
+To rebuild the gem's internal JS bundles:
 
 ```sh
 bundle install
@@ -165,16 +240,19 @@ yarn install
 yarn build
 ```
 
-This runs the scripts defined in `package.json` and regenerates the file
-`app/assets/builds/reactrails.js`.
+This regenerates `app/assets/builds/reactrails.js`.
 
-## Questions or problems?
+---
 
-If you have any issues please add an [issue on
-GitHub](https://github.com/pioz/reactrails/issues) or fork the project and send a
-pull request.
+## Questions or issues?
 
-## Copyright
+Please open an issue or pull request on GitHub:
+[https://github.com/pioz/reactrails/issues](https://github.com/pioz/reactrails/issues)
 
-Copyright (c) 2025 [Enrico Pilotto (@pioz)](https://github.com/pioz). See
-[LICENSE](https://github.com/pioz/reactrails/blob/master//MIT-LICENSE) for details.
+---
+
+## License
+
+Copyright (c) 2025
+[Enrico Pilotto (@pioz)](https://github.com/pioz).
+Released under the MIT License.
