@@ -4,24 +4,58 @@ require "json"
 class Reactrails::InstallGenerator < Rails::Generators::Base
   desc "Install ReactRails integration"
 
-  def import_reactrails
-    application_js_path = "app/javascript/application.js"
-    unless File.exist?(application_js_path)
-      say_status :warning, "application.js file not found: #{application_js_path}", :yellow
+  def add_reactrails_js_tag_to_layout
+    layout_path = "app/views/layouts/application.html.erb"
+    insert_line = '<%= javascript_include_tag "reactrails", "data-turbo-track": "reload", type: "module" %>'
+    anchor_line = '<%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>'
+
+    unless File.exist?(layout_path)
+      say_status :warning, "layout file not found: #{layout_path}", :yellow
       return
     end
 
-    insert_line = "import 'reactrails'"
+    content = File.read(layout_path)
 
-    content = File.read(application_js_path)
     if content.include?(insert_line)
-      say_status :info, "reactrails already present in application.js", :blue
+      say_status :info, "reactrails javascript tag already present in layout", :blue
       return
     end
 
-    new_content = [content.chomp, insert_line].join("\n")
-    File.write(application_js_path, new_content)
-    say_status :insert, "added reactrails application.js", :green
+    anchor_regex = /(.*)#{Regexp.escape(anchor_line)}/
+    match = content.match(anchor_regex)
+
+    unless match
+      say_status :warning, "anchor line for application javascript tag not found in layout", :yellow
+      return
+    end
+
+    indentation = match[1]
+    new_content = content.sub(anchor_line, "#{insert_line}\n#{indentation}#{anchor_line}")
+
+    File.write(layout_path, new_content)
+    say_status :insert, "added reactrails javascript_include_tag to layout", :green
+  end
+
+  def add_app_components_index
+    index_js_path = "app/javascript/components/index.js"
+    if File.exist?(index_js_path)
+      say_status :info, "#{index_js_path} already present", :blue
+      return
+    end
+
+    new_content = <<~FILE
+      import React from 'react'
+      import ReactDOMClient from 'react-dom/client'
+      import ReactDOMServer from 'react-dom/server'
+
+      // import App from './App'
+
+      initReactRails(React, ReactDOMClient, ReactDOMServer, {
+        // App
+      })
+    FILE
+    File.write(index_js_path, new_content)
+    say_status :insert, "added #{index_js_path}", :green
   end
 
   def add_build_ssr_script_to_package_json
@@ -93,24 +127,7 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
 
     new_content = content.sub(js_line, "#{js_line}\n#{ssr_line}")
     File.write(procfile_path, new_content)
-    say_status :insert, "added ssr process under js process in Procfile.dev", :green
-  end
-
-  def add_app_components_index
-    index_js_path = "app/javascript/components/index.js"
-    if File.exist?(index_js_path)
-      say_status :info, "#{index_js_path} already present", :blue
-      return
-    end
-
-    new_content = <<~FILE
-      import registerComponents from 'reactrails/registerComponents'
-
-      // Global registry for React components.
-      registerComponents({})
-    FILE
-    File.write(index_js_path, new_content)
-    say_status :insert, "Added #{index_js_path}", :green
+    say_status :insert, "added ssr process in Procfile.dev", :green
   end
 
   def add_initializer
@@ -122,23 +139,14 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
 
     new_content = <<~FILE
       Reactrails.configure do |config|
-        # Move SSR app registry bundle to a custom folder
-        # config.app_registry_bundle_path = Rails.root.join("app/assets/builds/ssr/index.js")
+        # Move SSR bundle file with `initReactRails` call to a custom path
+        # config.ssr_init_reactrails_bundle_path = Rails.root.join("app/assets/builds/ssr/index.js")
 
         # Optional JavaScript code used to customize the server-side rendering context
         # config.ssr_preload_code = nil
       end
     FILE
     File.write(initializer_path, new_content)
-    say_status :insert, "Added #{initializer_path}", :green
-  end
-
-  def add_js_symlinks
-    engine_js_source = Reactrails::Engine.root.join('app/javascript')
-    target_dir = Rails.root.join('node_modules', 'reactrails')
-    FileUtils.rm_rf(target_dir) if File.exist?(target_dir)
-    FileUtils.mkdir_p(File.dirname(target_dir))
-    File.symlink(engine_js_source, target_dir)
-    say_status :insert, "added js symlink: #{target_dir} -> #{engine_js_source}", :green
+    say_status :insert, "added #{initializer_path}", :green
   end
 end

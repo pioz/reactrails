@@ -24,9 +24,9 @@ class Reactrails::ReactRenderer
 
     def combined_source
       ssr_preload_code = Reactrails.config.ssr_preload_code
-      app_registry_bundle_path = Reactrails.config.app_registry_bundle_path
-      server_bundle_path = Reactrails::Engine.root.join("vendor/ssr.js")
-      [ssr_preload_code, File.read(app_registry_bundle_path), File.read(server_bundle_path)].compact.join("\n")
+      server_bundle_path = Reactrails::Engine.root.join("app/assets/builds/reactrails.js")
+      ssr_init_reactrails_bundle_path = Reactrails.config.ssr_init_reactrails_bundle_path
+      [ssr_preload_code, File.read(server_bundle_path), File.read(ssr_init_reactrails_bundle_path)].compact.join("\n")
     end
   end
 end
