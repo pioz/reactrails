@@ -66,19 +66,19 @@ class NodeRunner
 
   # Detect a working Node binary.
   def self.find_node_binary
-    # Use NODE_PATH explicitly
-    env_node = ENV.fetch("NODE_PATH", "")
+    # Use NODE_BINARY_PATH explicitly
+    env_node = ENV.fetch("NODE_BINARY_PATH", "")
     return env_node if File.executable?(env_node)
 
     # Try `node` in PATH
     which_path = `which node`.strip
     return which_path if File.executable?(which_path)
 
-    raise NodeError, "Node.js executable not found. Please install Node or set ENV['NODE_PATH'] to a valid executable path."
+    raise NodeError, "Node.js executable not found. Please install Node or set ENV['NODE_BINARY_PATH'] to a valid executable path."
   end
 
-  def initialize(node_path: nil)
-    @node_binary = node_path || self.class.find_node_binary
+  def initialize(node_binary_path: nil)
+    @node_binary_path = node_binary_path || self.class.find_node_binary
     @js_source = nil
   end
 
@@ -106,7 +106,7 @@ class NodeRunner
     }
 
     js_script = "#{@js_source}\n#{WRAPPER_JS}"
-    stdout, stderr, status = Open3.capture3(env, @node_binary, stdin_data: js_script)
+    stdout, stderr, status = Open3.capture3(env, @node_binary_path, stdin_data: js_script)
 
     # If Node exits with non-zero status we still try to parse stdout,
     # but if stdout is empty, we raise with stderr.
