@@ -35,6 +35,7 @@ class ReactRendererTest < ActiveSupport::TestCase
         end
       }) do
         combined = Reactrails::ReactRenderer.send(:combined_source)
+
         assert_equal "// preload\n/* GEM */\n/* APP SSR */", combined
       end
     end
@@ -48,6 +49,7 @@ class ReactRendererTest < ActiveSupport::TestCase
     Reactrails::ReactRenderer.stub(:combined_source, "/* BUNDLE */") do
       NodeRunner.stub(:new, ->(*) { runner }) do
         result = Reactrails::ReactRenderer.render("Hello", { foo: "bar" })
+
         assert_equal "<div>ok</div>", result
       end
     end

@@ -16,7 +16,7 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test "render_component with html options" do
-    html = render_component("Hello", {}, html_options: { class: 'text-primary' })
+    html = render_component("Hello", {}, html_options: { class: "text-primary" })
 
     assert_equal "<div class=\"text-primary\" data-react-component=\"Hello\" data-react-props=\"{}\"></div>", html
   end
@@ -24,6 +24,7 @@ class ApplicationHelperTest < ActionView::TestCase
   test "render_component with prerender" do
     Reactrails::ReactRenderer.stub(:render, "<p>SSR</p>") do
       html = render_component("Hello", {}, prerender: true)
+
       assert_equal "<div data-react-component=\"Hello\" data-react-props=\"{}\"><p>SSR</p></div>", html
     end
   end
