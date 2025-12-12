@@ -71,7 +71,8 @@ class NodeRunner
     return env_node if File.executable?(env_node)
 
     # Try `node` in PATH
-    which_path = `which node`.strip
+    which_cmd = Gem.win_platform? ? "where node" : "which node"
+    which_path = `#{which_cmd}`.strip
     return which_path if File.executable?(which_path)
 
     raise NodeError, "Node.js executable not found. Please install Node or set ENV['NODE_BINARY_PATH'] to a valid executable path."
