@@ -6,6 +6,6 @@
     "prettier": "^3.7.4"
   },
   "scripts": {
-    "build": "esbuild app/javascript/reactrails.js --bundle --sourcemap --format=esm --outdir=app/assets/builds --platform=browser --define:process.env.NODE_ENV=\\\"production\\\""
+    "build": "esbuild app/javascript/reactrails.js --bundle --sourcemap --format=esm --outdir=app/assets/builds --define:process.env.NODE_ENV=\\\"production\\\""
   }
 }

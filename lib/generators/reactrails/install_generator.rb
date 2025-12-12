@@ -83,7 +83,7 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
   def add_build_ssr_script_to_package_json
     package_json_path = "package.json"
     script_name = "build:ssr"
-    script_command = "esbuild app/javascript/components/index.js --bundle --sourcemap --format=esm --platform=node --outdir=app/assets/builds/ssr --define:process.env.NODE_ENV=\\\"production\\\""
+    script_command = "esbuild app/javascript/components/index.js --bundle --sourcemap --format=esm --platform=node --jsx=automatic --outdir=app/assets/builds/ssr --define:process.env.NODE_ENV=\\\"production\\\""
 
     unless File.exist?(package_json_path)
       say_status :warning, "package.json not found", :yellow

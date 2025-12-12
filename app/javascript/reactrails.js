@@ -70,7 +70,6 @@ const init = (React, ReactDOMClient, ReactDOMServer, registryComponents) => {
       return ReactDOMServer.renderToString(reactElement)
     }
   }
-
 }
 
 globalThis.initReactRails = init
