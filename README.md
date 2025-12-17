@@ -10,6 +10,50 @@ It provides:
 - Automatic **client-side rendering or hydration** using a lightweight loader script.
 - Optional **SSR support** for better SEO, improved perceived performance, and a faster first paint.
 
+Ecco una **sezione di disclaimer in inglese**, pensata per essere inserita nel
+README di **reactrails**. Il tono è chiaro, onesto e orientato a evitare
+fraintendimenti sull’uso della gemma.
+
+## Disclaimer
+
+⚠️ **This gem is NOT intended to build a fully React-based frontend.**
+
+`reactrails` is **not** a solution for applications where React is the primary
+UI layer or where the frontend is completely decoupled from Rails.
+
+If your goal is to build a **fully independent React frontend**, you should
+consider other approaches, such as:
+
+- A **separate frontend application** using [**Next.js**](https://github.com/vercel/next.js) (or similar) with Rails used purely as an API.
+- More **full-featured Rails integrations** that rethink the frontend architecture, such as [**Inertia Rails**](https://github.com/inertiajs/inertia-rails).
+
+These solutions are better suited for SPAs, large-scale frontend
+architectures, or teams that want a clear separation between frontend and
+backend.
+
+### When `reactrails` _does_ make sense
+
+This gem is designed for **classic Rails applications** that:
+
+- Use **ERB views**.
+- Rely on the **traditional Rails rendering pipeline**.
+- Do **not** want to migrate the entire frontend to React.
+
+`reactrails` shines when you need to enhance **specific pages or sections**
+with richer interactivity, while keeping the rest of the application simple
+and server-rendered.
+
+Typical use cases include:
+
+- Highly interactive forms (dynamic validations, conditional fields, live previews).
+- Complex UI components (filters, dashboards, drag-and-drop interfaces).
+- Real-time user interactions that would be cumbersome with plain JavaScript or Stimulus.
+
+In these scenarios, React components are **mounted inside classic Rails
+views**, allowing you to combine the strengths of Rails
+(simplicity, conventions, server rendering) with the power of React **only
+where it actually adds value**.
+
 ---
 
 ## Installation
@@ -54,7 +98,7 @@ This function accepts:
 
 - `React`
 - `ReactDOMClient`
-- (optional) `ReactDOMServer` — required if you want SSR
+- (optional) `ReactDOMServer` — can be `null`, required only if you want SSR
 - a **registry object** mapping names to components
 
 Example (`app/javascript/components/index.js`):

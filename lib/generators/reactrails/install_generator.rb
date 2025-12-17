@@ -82,8 +82,12 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
 
   def add_build_ssr_script_to_package_json
     package_json_path = "package.json"
-    script_name = "build:ssr"
-    script_command = "esbuild app/javascript/components/index.js --bundle --sourcemap --format=esm --platform=node --jsx=automatic --outdir=app/assets/builds/ssr --define:process.env.NODE_ENV=\\\"production\\\""
+    build_key = "build"
+    build_js_key = "build:js"
+    build_ssr_key = "build:ssr"
+
+    build_command = "yarn build:js && yarn build:ssr"
+    build_ssr_command = "esbuild app/javascript/components/index.js --bundle --sourcemap --format=esm --platform=node --jsx=automatic --outdir=app/assets/builds/ssr --define:process.env.NODE_ENV=\\\"production\\\""
 
     unless File.exist?(package_json_path)
       say_status :warning, "package.json not found", :yellow
@@ -94,33 +98,30 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
     json["scripts"] ||= {}
     scripts = json["scripts"]
 
-    if scripts.key?(script_name)
-      say_status :info, "script #{script_name} already present in package.json", :blue
-      return
+    if scripts.key?(build_key) && !scripts.key?(build_js_key)
+      scripts[build_js_key] = scripts.delete(build_key)
     end
 
-    new_scripts = {}
-    inserted = false
-
-    if scripts.any?
-      scripts.each do |key, value|
-        new_scripts[key] = value
-        if key == "build"
-          new_scripts[script_name] = script_command
-          inserted = true
-        end
-      end
+    unless scripts.key?(build_ssr_key)
+      scripts[build_ssr_key] = build_ssr_command
     end
 
-    unless inserted
-      new_scripts = scripts.dup if new_scripts.empty? && scripts.any?
-      new_scripts[script_name] = script_command
+    scripts[build_key] = build_command
+
+    ordered = {}
+    ordered[build_key] = scripts[build_key] if scripts.key?(build_key)
+    ordered[build_js_key] = scripts[build_js_key] if scripts.key?(build_js_key)
+    ordered[build_ssr_key] = scripts[build_ssr_key] if scripts.key?(build_ssr_key)
+
+    scripts.each do |k, v|
+      next if ordered.key?(k)
+      ordered[k] = v
     end
 
-    json["scripts"] = new_scripts
+    json["scripts"] = ordered
 
     File.write(package_json_path, "#{JSON.pretty_generate(json)}\n")
-    say_status :insert, "added #{script_name} to package.json scripts", :green
+    say_status :insert, "updated package.json scripts", :green
   rescue JSON::ParserError
     say_status :error, "package.json is not valid JSON", :red
   end
@@ -128,7 +129,7 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
   def add_ssr_process_to_procfile
     procfile_path = "Procfile.dev"
     js_line = "js: yarn build --watch"
-    ssr_line = "ssr: yarn build:ssr --watch"
+    ssr_line = "js: yarn build:js --watch\nssr: yarn build:ssr --watch"
 
     unless File.exist?(procfile_path)
       say_status :warning, "Procfile.dev not found", :yellow
@@ -147,7 +148,7 @@ class Reactrails::InstallGenerator < Rails::Generators::Base
       return
     end
 
-    new_content = content.sub(js_line, "#{js_line}\n#{ssr_line}")
+    new_content = content.sub(js_line, ssr_line)
     File.write(procfile_path, new_content)
     say_status :insert, "added ssr process in Procfile.dev", :green
   end
