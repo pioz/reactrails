@@ -10,10 +10,6 @@ It provides:
 - Automatic **client-side rendering or hydration** using a lightweight loader script.
 - Optional **SSR support** for better SEO, improved perceived performance, and a faster first paint.
 
-Ecco una **sezione di disclaimer in inglese**, pensata per essere inserita nel
-README di **reactrails**. Il tono è chiaro, onesto e orientato a evitare
-fraintendimenti sull’uso della gemma.
-
 ## Disclaimer
 
 ⚠️ **This gem is NOT intended to build a fully React-based frontend.**
